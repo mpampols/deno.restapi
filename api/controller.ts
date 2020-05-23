@@ -29,7 +29,7 @@ let movies: Array<Movie> = [
     rating: 9,
   },
   {
-    id: "3",
+    id: "5",
     title: "Onward",
     rating: 8,
   },
@@ -55,7 +55,7 @@ const getMovie = ({
   const movie = movies.filter((movie) => movie.id == params.id)[0];
   if (movie) {
     response.status = 200;
-    response.body = movies[0];
+    response.body = movie;
   } else {
     response.status = 404;
     response.body = { message: "404 Not found" };
@@ -72,9 +72,10 @@ const createMovie = async ({
   request: any;
   response: any;
 }) => {
-  const movie: Movie = await request.body().value;
+  const body = await request.body();
+  const movie: Movie = body.value;
   movies.push(movie);
-  response.body = { message: "201 Created" };
+  response.body = { success: true, data: movie };
   response.status = 201;
 };
 
@@ -96,10 +97,16 @@ const updateMovie = async ({
     movie.title = body.value.title;
     movie.rating = body.value.rating;
     response.status = 200;
-    response.body = { message: "200 Updated" };
+    response.body = {
+      success: true,
+      data: movies,
+    };
   } else {
     response.status = 404;
-    response.body = { message: "404 Not found" };
+    response.body = {
+      success: false,
+      message: "Movie not found",
+    };
   }
 };
 
@@ -113,9 +120,9 @@ const deleteMovie = ({
   params: { id: string };
   response: any;
 }) => {
-  const movie = movies.filter((movie) => movie.id == params.id)[0];
+  movies = movies.filter((movie) => movie.id !== params.id);
   response.status = 200;
-  response.body = { message: "200 Deleted" };
+  response.body = { success: true, message: "Movie removed" };
 };
 
 export { getMovies, getMovie, createMovie, updateMovie, deleteMovie };
